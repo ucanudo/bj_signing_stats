@@ -96,13 +96,14 @@ def get_date(table):
     rows0 = table.find_all('tr')[0]
     # 定义正则表达式模式来匹配日期
     pattern = r'(\d{4}/\d{1,2}/\d{1,2})'
-
+    
+    
     # 使用 re.search 函数查找匹配的日期
     match = re.search(pattern, rows0.get_text(strip=True))
 
     if match:
         # 如果找到匹配项，提取日期
-        date = match.group(1)
+        date = match.group(1) 
         print(date)
         return date
     else:
@@ -261,9 +262,10 @@ def insert_data_into_database(result):
     conn.close()
 
 
-# if __name__ == '__main__':
-#     # with open('3.8.html', 'r', encoding='utf-8') as f:
-#     #     html_content = f.read()
-#     html_url = 'http://bjjs.zjw.beijing.gov.cn/eportal/ui?pageId=307749'
-#     result = parse_html(html_url)
+if __name__ == '__main__':
+     # with open('3.8.html', 'r', encoding='utf-8') as f:
+     #     html_content = f.read()
+     html_url = 'http://bjjs.zjw.beijing.gov.cn/eportal/ui?pageId=307749'
+     content = get_html_content(html_url)
+     result = parse_html(content)
 

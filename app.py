@@ -1,5 +1,7 @@
-from flask import Flask, render_template
+import datetime
+from flask import Flask, render_template,Blueprint
 import sqlite3
+
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.interval import IntervalTrigger
@@ -12,7 +14,7 @@ scheduler = BackgroundScheduler(timezone='Asia/Shanghai')
 scheduler.add_job(
     id='daily_contracts_job',
     func=lambda: process_real_estate_data_.parse_html(process_real_estate_data_.get_html_content('http://bjjs.zjw.beijing.gov.cn/eportal/ui?pageId=307749')),
-    trigger=IntervalTrigger(hours=24, start_date='2024-01-01 08:30:00'),
+    trigger=IntervalTrigger(hours=24, start_date='2024-01-01 09:59:00'),
     misfire_grace_time=60
 )
 scheduler.start()
@@ -34,6 +36,11 @@ def get_real_estate_data():
     # 获取存量房数据  
     cursor.execute("SELECT createtime, data FROM second_hand WHERE item='住宅签约套数：'")
     second_homes = cursor.fetchall()
+
+    # 按日期排序
+    one_homes.sort(key=lambda x: datetime.datetime.strptime(x[0], '%Y/%m/%d'))
+    presale_homes.sort(key=lambda x: datetime.datetime.strptime(x[0], '%Y/%m/%d'))
+    second_homes.sort(key=lambda x: datetime.datetime.strptime(x[0], '%Y/%m/%d'))
     
     # 计算每日现房数据和期房数据的和
     new_data = {}
@@ -51,7 +58,6 @@ def get_real_estate_data():
         if createtime not in new_data:
             new_data[createtime] = 0
         new_data[createtime] +=  int(data)
-        print(new_data)
     
     # 转换为列表格式
     one_homes_sign = [(date, total) for date, total in new_data.items()]
